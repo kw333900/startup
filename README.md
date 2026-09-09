@@ -12,11 +12,11 @@ A brief description of the application here. Lorem ipsum dolor sit amet, consect
 
 ### Elevator pitch
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Most Americans watch up to 4,000 movies in their lifetime. But if I asked you, "What are your top 10 all-time favorite movies and what did you learn from them?", the hamster in your brain would run for 67 seconds and then blow up. Our brains aren't built to remember all of that. The dullest pencil is better than the sharpest memory. T.N. Ratings lets you rate a movie 0-10 according to your 'Rating Philosophy/Criteria' page, write your own breif review, and automatically sorts it into your 'MyRatings' page. Aditionally, the 'Groups' page lets you join groups where you can see the movie ratings and movie insights of all your family and friends in real-time.
 
 ### Design
 
-![Design image](placeholder.png)
+<img src="specimage.png" alt="Design image" width="300">
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
