@@ -17,7 +17,9 @@ Interesting things I have learned about AWS
 
 ## HTML
 
-Interesting things I have learned about HTML
+Interesting things I have learned about HTML:
+
+- You can have JS and CSS in an HTML file. But you cannot have HTML in a JS or CSS file.
 
 ## React
 
