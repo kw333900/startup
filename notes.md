@@ -1,4 +1,4 @@
-# CS 260 Notes
+# CS 260 Notes - I love web programming
 
 This file represents what I have learned about web programming.
 
