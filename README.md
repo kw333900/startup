@@ -27,7 +27,7 @@ T.N. Ratings: Don't just watch movies. Remember them.
 ### Key features
 
 - Secure login over HTTPS
-- Allows each user to create their own 'Rating Philosophy' page (viewable by all other group members)
+- Allows each user to create their own 'Rating Philosophy' page (viewable by all other group members in real time)
 - Ability to quickly add to 'MyRatings' page
 - All ratings persistently stored to T.N. Database
 - Ability to join groups with other users to see their ratings as well
