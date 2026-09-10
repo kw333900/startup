@@ -12,7 +12,11 @@ A brief description of the application here. Lorem ipsum dolor sit amet, consect
 
 ### Elevator pitch
 
-Most Americans watch up to 4,000 movies in their lifetime. But if I asked you, "What are your top 10 all-time favorite movies and what did you learn from them?", the hamster in your brain would run for 67 seconds and then blow up. Our brains aren't built to remember all of that. The dullest pencil is better than the sharpest memory. T.N. Ratings lets you rate a movie 0-10 according to your 'Rating Philosophy/Criteria' page, write your own breif review, and automatically sorts it into your 'MyRatings' page. Aditionally, the 'Groups' page lets you join groups where you can see the movie ratings and movie insights of all your family and friends in real-time.
+You've probably watched hundreds (or even thousands) of movies in your lifetime. But if I asked you, "What are your top 10 all-time favorite movies and what did you learn from them?", the hamster in your brain would run the wheel for 67 seconds and then blow up. You watch a movie and forget about it a few months later. Think of all the profound lessons and cinematic experiences from the life-affecting films you've seen that are lost in your hamster brain! 
+
+THE SOLUTION: T.N. Ratings lets you rate every movie 0-10 according to your own 'Rating Philosophy' page, record how it impacted you, and then automatically sorts it into your 'MyRatings' page, so they'll never be lost. Then, on the 'Groups' page, you can see all the ratings of your family and friends in real time. 
+
+T.N. Ratings: Don't just watch movies. Remember them.
 
 ### Design
 
