@@ -37,12 +37,20 @@ T.N. Ratings: Don't just watch movies. Remember them.
 
 I am going to use the required technologies in the following ways.
 
-- **HTML** - Description here
-- **CSS** - Description here
-- **React** - Description here
-- **Service** - Description here
-- **DB/Login** - Description here
-- **WebSocket** - Description here
+- **HTML** -  Uses correct HTML structure for application with HTML pages for the following:
+  - login
+  - 'MyRatings'
+  - 'Groups'
+  - 'MyAccount' + 'Rating Philosophy'
+- **CSS** - Application stying that uses good whitespace and contrasted colors so that buttons such as 'Add Rating' or 'Join Group' are easily found.
+- **React** - React is used for simple display and UI functionality with adding to, searching, and viewing Ratings pages.
+- **Service** - Backend service with endpoints for:
+  - register
+  - login
+  - add rating
+  - join group
+- **DB/Login** - T.N. Database registers and logs in users. Securely stores user info. Persists all ratings. Can't add or join unless authenticated.
+- **WebSocket** - When any group member adds a rating, every other group member is notified.
 
 ## 🚀 Specification Deliverable
 
