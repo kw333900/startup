@@ -49,6 +49,7 @@ I am going to use the required technologies in the following ways.
   - login
   - add rating
   - join group
+  - displaying a movie quote using the https://github.com/F4R4N/movie-quote/ service
 - **DB/Login** - T.N. Database registers and logs in users. Securely stores user info. Persists all ratings. Can't add or join unless authenticated.
 - **WebSocket** - When any group member adds a rating, every other group member is notified.
 
