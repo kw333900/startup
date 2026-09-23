@@ -80,15 +80,15 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
 - [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [x] **HTML pages** - I did not complete this part of the deliverable.
-- [x] **Proper HTML element usage** - I did not complete this part of the deliverable.
-- [x] **Links** - I did not complete this part of the deliverable.
-- [x] **Text** - I did not complete this part of the deliverable.
+- [x] **HTML pages** - Made 4 html pages (index, myratings, groups, & about).
+- [x] **Proper HTML element usage** - Images and other elements inserted.
+- [x] **Links** - Link to related YT video included on about page.
+- [x] **Text** - Text is formatted.
 - [x] **3rd party API placeholder** - I did not complete this part of the deliverable.
-- [x] **Images** - I did not complete this part of the deliverable.
-- [x] **Login placeholder** - I did not complete this part of the deliverable.
-- [x] **DB data placeholder** - I did not complete this part of the deliverable.
-- [x] **WebSocket placeholder** - I did not complete this part of the deliverable.
+- [x] **Images** - Image is included in about page.
+- [x] **Login placeholder** - On home page.
+- [x] **DB data placeholder** - On myratings and groups pages.
+- [x] **WebSocket placeholder** - On groups pages when a fellow group member rates a new movie. 
 
 ## 🚀 CSS deliverable
 
