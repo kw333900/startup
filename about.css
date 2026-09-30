@@ -1,0 +1,37 @@
+p {
+  max-width: 65ch;
+  line-height: 1.6;
+}
+
+.picture-box {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.5rem;
+  background: var(--panel);
+  border-radius: 5px;
+}
+
+#picture img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 3px;
+}
+
+#quote {
+  max-width: 65ch;
+  padding: 0.75rem 1rem;
+  background: var(--panel);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 5px 5px 0;
+}
+
+#quote div:first-child {
+  font-style: italic;
+}
+
+#quote div:last-child {
+  margin-top: 0.5rem;
+  font-weight: bold;
+  text-align: right;
+}
