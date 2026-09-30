@@ -1,0 +1,27 @@
+.notification {
+  width: 100%;
+  max-width: 700px;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  list-style: none;
+  background: var(--panel);
+  border-left: 3px solid var(--accent);
+  border-radius: 5px;
+}
+
+.notification li {
+  padding: 0.4rem 0;
+}
+
+.notification li:not(:last-child) {
+  border-bottom: 1px solid rgba(236, 231, 219, 0.15);
+}
+
+.notification li::before {
+  content: "\2605\00a0";
+  color: var(--accent);
+}
+
+.player-name {
+  color: rgb(118, 190, 210);
+}
