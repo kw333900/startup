@@ -108,8 +108,8 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 - [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
 - [x] **Bundled using Vite** - Installed Vite and adopted its file structure. 'npm run build' translated JSX into JS and bundled the CSS and libraries into dist folder.
-- [x] **Components** - Created 4 separate component files its own <main> HTML: login.jsx, groups.jsx, myratings.jsx, & about.jsx. While app.jsx contains the <header> and <footer> HTML.
-- [x] **Router** - Wrapped the app function in app.jsx with <BrowserRouter> to use routing. <NavLink> replaced old <a> tags so that clicking one changes the URL and swaps the component without asking the server for a new page every time. 
+- [x] **Components** - Created 4 separate component files (each with its own 'main' HTML): login.jsx, groups.jsx, myratings.jsx, & about.jsx. While app.jsx contains the 'header' and 'footer' HTML.
+- [x] **Router** - Wrapped the app function in app.jsx with 'BrowserRouter' to use routing. 'NavLink' replaced old 'a' tags so that clicking one changes the URL and swaps the component without asking the server for a new page every time. 
 
 ## 🚀 React part 2: Reactivity deliverable
 
