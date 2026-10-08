@@ -108,7 +108,7 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 - [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
 - [x] **Bundled using Vite** - Installed Vite and adopted its file structure. 'npm run build' translated JSX into JS and bundled the CSS and libraries into dist folder.
-- [ ] **Components** - I did not complete this part of the deliverable.
+- [x] **Components** - I did not complete this part of the deliverable.
 - [ ] **Router** - I did not complete this part of the deliverable.
 
 ## 🚀 React part 2: Reactivity deliverable
