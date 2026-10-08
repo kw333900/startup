@@ -1,9 +1,31 @@
 import React from 'react';
+import './about.css';
 
 export function About() {
   return (
-    <main className="container-fluid bg-secondary text-center">
-      <div>about displayed here</div>
+      <main>
+      <div id="picture" className="picture-box"><img width="400px" src="matrix.jpg" alt="Oracle scene from The Matrix" /></div>
+
+        <p>
+            Temet Nosce scene from 'The Matrix': <a href="https://youtu.be/sOnvg94E6_w?si=M1_eNs9F9OAO1pYh">Watch the scene</a>
+        </p>
+
+      <p>
+       T.N. Ratings is predicated on the concept of Temet Nosce (T.N.), a latin phrase which means Know Thyself. 
+       Rating things shows what you value and why you value it. Knowing what you value helps you know yourself 
+       better and align your values with what is real, true, good, just, and beautiful. (This version will only 
+       provide functionality for movie ratings and expand in the future.)
+      </p>
+
+
+      <div id="quote">
+        <div>	- “The greatest battle of life is fought out within the silent chambers of the soul. A victory on 
+            the inside of a man's heart is worth a hundred conquests on the battlefields of life. To be master of 
+            yourself is the best guarantee that you will be master of the situation. Know thyself, the crown of 
+            character is self-control.” 
+</div>
+        <div>- (Spencer W. Kimball, The Miracle of Forgiveness, pg. 235)</div>
+      </div>
     </main>
   );
 }

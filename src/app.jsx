@@ -3,8 +3,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './app.css';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
 import { Login } from './login/login';
-import { Play } from './groups/groups';
-import { Scores } from './myratings/myratings';
+import { Groups } from './groups/groups';
+import { MyRatings } from './myratings/myratings';
 import { About } from './about/about';
 
 export default function App() {
@@ -16,7 +16,7 @@ export default function App() {
 
 			<nav>
       <menu>
-        <li><NavLink to="">Home</NavLink></li>
+        <li><NavLink to="">Login</NavLink></li>
         <li><NavLink to="myratings">MyRatings</NavLink></li>
         <li><NavLink to="groups">Groups</NavLink></li>
         <li><NavLink to="about">About</NavLink></li>
@@ -29,7 +29,7 @@ export default function App() {
 
 
     <Routes>
-      <Route path='/' element={<Home />} />
+      <Route path='/' element={<Login />} />
       <Route path='/myratings' element={<MyRatings />} />
       <Route path='/groups' element={<Groups />} />
       <Route path='/about' element={<About />} />
