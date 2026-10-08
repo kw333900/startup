@@ -4,7 +4,7 @@ import './about.css';
 export function About() {
   return (
       <main>
-      <div id="picture" className="picture-box"><img width="400px" src="matrix.jpg" alt="Oracle scene from The Matrix" /></div>
+      <div id="picture" className="picture-box"><img width="400px" src="/matrix.jpg" alt="Oracle scene from The Matrix" /></div>
 
         <p>
             Temet Nosce scene from 'The Matrix': <a href="https://youtu.be/sOnvg94E6_w?si=M1_eNs9F9OAO1pYh">Watch the scene</a>

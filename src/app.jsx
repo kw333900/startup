@@ -16,7 +16,7 @@ export default function App() {
 
 			<nav>
       <menu>
-        <li><NavLink to="">Login</NavLink></li>
+        <li><NavLink to="/">Login</NavLink></li>
         <li><NavLink to="myratings">MyRatings</NavLink></li>
         <li><NavLink to="groups">Groups</NavLink></li>
         <li><NavLink to="about">About</NavLink></li>

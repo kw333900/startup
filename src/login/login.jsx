@@ -1,10 +1,19 @@
 import React from 'react';
 
 export function Login() {
+
+  const navigate = useNavigate();
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    navigate('/myratings');
+  }
+
+
   return (
        <main>
       <h1>Welcome to T.N. Ratings</h1>
-      <form method="get" action="myratings.html">
+      <form onSubmit={handleSubmit}>
   <div className="input-group mb-3">
     <span className="input-group-text">@</span>
     <input className="form-control" type="text" placeholder="your@email.com" />
