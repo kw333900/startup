@@ -39,7 +39,7 @@ export default function App() {
 
         <footer>
           <hr />
-          <span className="text-reset">Author Name(s)</span>
+          <span className="text-reset">Kody Wastlund</span>
           <br />
           <a href="https://github.com/kw333900/startup">GitHub</a>
       </footer>
