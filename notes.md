@@ -23,4 +23,7 @@ Interesting things I have learned about HTML:
 
 ## React
 
-Interesting things I have learned about React
+Interesting things I have learned about React:
+
+- Reactivity of an application is more than just a button 'reacting' and changing color when you hover over it.
+It is when the data under the hood is accurately changed and reflected after the user has changed it (logged in, recorded a score, etc.).
