@@ -53,14 +53,16 @@ const sortedRatings = [...ratings].sort((a, b) => b.rating - a.rating);
   return (
     <main>
       <div className="d-flex justify-content-end mb-2">
-        <button
-          type="button"
-          className="btn btn-primary"
-          aria-label={showForm ? 'Close add rating form' : 'Add rating'}
-          onClick={() => setShowForm(!showForm)}
-        >
-          {showForm ? '×' : '+'}
-        </button>
+			<button
+	type="button"
+	className="btn btn-primary"
+	aria-label={showForm ? 'Close add rating form' : 'Add rating'}
+	onClick={() => setShowForm(!showForm)}
+	>
+	<span style={{ fontSize: '1.5rem', fontWeight: 'bold', lineHeight: 1 }}>
+		{showForm ? '×' : '+'}
+	</span>
+	</button>
       </div>
 
       {showForm && (

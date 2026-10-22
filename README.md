@@ -84,7 +84,7 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [x] **Proper HTML element usage** - Images and other elements inserted.
 - [x] **Links** - Link to related YT video included on about page.
 - [x] **Text** - Text is formatted.
-- [x] **3rd party API placeholder** - I did not complete this part of the deliverable.
+- [x] **3rd party API placeholder** - Random movie quote.
 - [x] **Images** - Image is included in about page.
 - [x] **Login placeholder** - On home page.
 - [x] **DB data placeholder** - On myratings and groups pages.
