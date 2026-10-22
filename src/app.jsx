@@ -37,12 +37,11 @@ export default function App() {
     </Routes>
 
 
-        <footer>
-          <hr />
+                <footer className="d-flex flex-column align-items-start text-start">
+          <hr className="w-100" />
           <span className="text-reset">Kody Wastlund</span>
-          <br />
           <a href="https://github.com/kw333900/startup">GitHub</a>
-      </footer>
+        </footer>
     </div>
     </BrowserRouter>
   );

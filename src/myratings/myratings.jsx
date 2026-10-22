@@ -39,7 +39,9 @@ export function MyRatings() {
     setShowForm(false);
   }
 
-  const rows = ratings.map((r, i) => (
+const sortedRatings = [...ratings].sort((a, b) => b.rating - a.rating);
+
+  const rows = sortedRatings.map((r, i) => (
     <tr key={r.id}>
       <td>{i + 1}</td>
       <td>{r.name}</td>
