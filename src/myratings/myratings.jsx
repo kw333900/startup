@@ -21,6 +21,24 @@ export function MyRatings() {
     localStorage.setItem('ratings', JSON.stringify(ratings));
   }, [ratings]);
 
+  const [criteria, setCriteria] = React.useState(() => localStorage.getItem('criteria') || '');
+  const [editingCriteria, setEditingCriteria] = React.useState(criteria === '');
+  const [criteriaDraft, setCriteriaDraft] = React.useState(criteria);
+
+  React.useEffect(() => {
+    localStorage.setItem('criteria', criteria);
+  }, [criteria]);
+
+  function startEditingCriteria() {
+    setCriteriaDraft(criteria);
+    setEditingCriteria(true);
+  }
+
+  function saveCriteria() {
+    setCriteria(criteriaDraft.trim());
+    setEditingCriteria(false);
+  }
+
   function handleSubmit(event) {
     event.preventDefault();
     if (!name.trim()) return;
@@ -39,7 +57,7 @@ export function MyRatings() {
     setShowForm(false);
   }
 
-const sortedRatings = [...ratings].sort((a, b) => b.rating - a.rating);
+  const sortedRatings = [...ratings].sort((a, b) => b.rating - a.rating);
 
   const rows = sortedRatings.map((r, i) => (
     <tr key={r.id}>
@@ -53,16 +71,16 @@ const sortedRatings = [...ratings].sort((a, b) => b.rating - a.rating);
   return (
     <main>
       <div className="d-flex justify-content-end mb-2">
-			<button
-	type="button"
-	className="btn btn-primary"
-	aria-label={showForm ? 'Close add rating form' : 'Add rating'}
-	onClick={() => setShowForm(!showForm)}
-	>
-	<span style={{ fontSize: '1.5rem', fontWeight: 'bold', lineHeight: 1 }}>
-		{showForm ? '×' : '+'}
-	</span>
-	</button>
+        <button
+          type="button"
+          className="btn btn-primary"
+          aria-label={showForm ? 'Close add rating form' : 'Add rating'}
+          onClick={() => setShowForm(!showForm)}
+        >
+          <span style={{ fontSize: '1.5rem', fontWeight: 'bold', lineHeight: 1 }}>
+            {showForm ? '×' : '+'}
+          </span>
+        </button>
       </div>
 
       {showForm && (
@@ -109,17 +127,51 @@ const sortedRatings = [...ratings].sort((a, b) => b.rating - a.rating);
         </form>
       )}
 
-      <table className="table table-striped">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Rating</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
-      </table>
+      <div className="row">
+        <div className="col-md-8">
+          <table className="table table-striped">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Rating</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>{rows}</tbody>
+          </table>
+        </div>
+
+        <div className="col-md-4">
+          <div className="border rounded p-3">
+            <h2 className="h5">MyRating Criteria:</h2>
+            {editingCriteria ? (
+              <>
+                <textarea
+                  className="form-control mb-2"
+                  rows="6"
+                  placeholder="What do you look for when you rate a movie?"
+                  value={criteriaDraft}
+                  onChange={(e) => setCriteriaDraft(e.target.value)}
+                />
+                <button type="button" className="btn btn-primary" onClick={saveCriteria}>
+                  Save
+                </button>{' '}
+                <button type="button" className="btn btn-secondary" onClick={() => setEditingCriteria(false)}>
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <>
+                <p style={{ whiteSpace: 'pre-wrap' }}>{criteria || 'No criteria written yet.'}</p>
+                <button type="button" className="btn btn-secondary" onClick={startEditingCriteria}>
+                  Edit
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
     </main>
   );
 }
