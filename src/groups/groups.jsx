@@ -96,7 +96,7 @@ export function Groups() {
   const [joinMessage, setJoinMessage] = React.useState('');
 
   React.useEffect(() => {
-    // This will be replaced with WebSocket messages
+    // This will be replaced with WebSocket messages later
     const timer = setInterval(() => {
       const options = [];
       groups
