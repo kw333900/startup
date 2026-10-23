@@ -9,7 +9,7 @@ const MOCK_QUOTES = [
   { quote: 'May the Force be with you.', show: 'Star Wars' },
 ];
 
-// This will be replaced with a call to the quote service
+// This will be replaced with a call to the quote service later
 function getRandomQuote() {
   return MOCK_QUOTES[Math.floor(Math.random() * MOCK_QUOTES.length)];
 }
