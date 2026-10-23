@@ -116,7 +116,7 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
 - [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [x] **All functionality implemented or mocked out** - JS and React used so that web app is fully functional for single user. Ratings stored in local storage. 'setInterval' used to simulate rating notifications from other group members (WebSocket will do this later). 
+- [x] **All functionality implemented or mocked out** - JS and React used so that web app is fully functional for single user. Ratings stored in local storage. 'setInterval' used to simulate rating notifications from other group members (WebSocket will do this later). Added placeholder for random movie quote API.
 - [x] **Hooks** - 'useState' used for login state, form inputs, ratings, criteria, selected group and member. 'useEffect' used to save ratings and criteria when they change. 
 
 ## 🚀 Service deliverable
