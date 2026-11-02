@@ -20,7 +20,7 @@ T.N. Ratings: Don't just watch movies. Remember them.
 
 ### Design
 
-<img src="specimage.png" alt="Design image" width="300">
+<img src="public/specimage.png" alt="Design image" width="300">
 
 
 
