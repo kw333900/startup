@@ -49,7 +49,7 @@ I am going to use the required technologies in the following ways.
   - login
   - add rating
   - join group
-  - displaying a movie quote using the https://github.com/F4R4N/movie-quote/ service
+  - displaying a random quote using the https://quote.cs260.click service
 - **DB/Login** - T.N. Database registers and logs in users. Securely stores user info. Persists all ratings. Can't add or join unless authenticated.
 - **WebSocket** - When any group member adds a rating, every other group member is notified.
 
@@ -84,7 +84,7 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [x] **Proper HTML element usage** - Images and other elements inserted.
 - [x] **Links** - Link to related YT video included on about page.
 - [x] **Text** - Text is formatted.
-- [x] **3rd party API placeholder** - Random movie quote.
+- [x] **3rd party API placeholder** - Random quote.
 - [x] **Images** - Image is included in about page.
 - [x] **Login placeholder** - On home page.
 - [x] **DB data placeholder** - On myratings and groups pages.
@@ -116,7 +116,7 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
 - [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [x] **All functionality implemented or mocked out** - JS and React used so that web app is fully functional for single user. Ratings stored in local storage. 'setInterval' used to simulate rating notifications from other group members (WebSocket will do this later). Added placeholder for random movie quote API.
+- [x] **All functionality implemented or mocked out** - JS and React used so that web app is fully functional for single user. Ratings stored in local storage. 'setInterval' used to simulate rating notifications from other group members (WebSocket will do this later). Added placeholder for random quote API.
 - [x] **Hooks** - 'useState' used for login state, form inputs, ratings, criteria, selected group and member. 'useEffect' used to save ratings and criteria when they change. 
 
 ## 🚀 Service deliverable
