@@ -55,7 +55,7 @@ apiRouter.delete('/auth/logout', async (req, res) => {
   res.status(204).end();
 });
 
-// Guard for endpoints that need a logged-in user. Used starting in the next steps.
+// Guard for endpoints that need a logged-in user
 const verifyAuth = async (req, res, next) => {
   const user = await findUser('token', req.cookies[authCookieName]);
   if (user) {
@@ -65,6 +65,49 @@ const verifyAuth = async (req, res, next) => {
     res.status(401).send({ msg: 'Unauthorized' });
   }
 };
+
+// Get the logged-in user's ratings
+apiRouter.get('/ratings', verifyAuth, (req, res) => {
+  res.send(req.user.ratings);
+});
+
+// Add a rating for the logged-in user
+apiRouter.post('/ratings', verifyAuth, (req, res) => {
+  const { name, rating, date } = req.body;
+  const valid =
+    typeof name === 'string' &&
+    name.trim() !== '' &&
+    typeof rating === 'number' &&
+    Number.isFinite(rating) &&
+    rating >= 0 &&
+    rating <= 10 &&
+    typeof date === 'string' &&
+    /^\d{4}-\d{2}-\d{2}$/.test(date);
+
+  if (!valid) {
+    res.status(400).send({ msg: 'A name, a rating from 0 to 10, and a date (YYYY-MM-DD) are required' });
+    return;
+  }
+
+  req.user.ratings.push({ id: uuid.v4(), name: name.trim(), rating: rating, date: date });
+  res.send(req.user.ratings);
+});
+
+// Get the logged-in user's criteria text
+apiRouter.get('/criteria', verifyAuth, (req, res) => {
+  res.send({ criteria: req.user.criteria });
+});
+
+// Save the logged-in user's criteria text
+apiRouter.put('/criteria', verifyAuth, (req, res) => {
+  const { criteria } = req.body;
+  if (typeof criteria !== 'string' || criteria.length > 2000) {
+    res.status(400).send({ msg: 'Criteria must be text of 2000 characters or fewer' });
+    return;
+  }
+  req.user.criteria = criteria;
+  res.send({ criteria: req.user.criteria });
+});
 
 // Default error handler
 app.use(function (err, req, res, next) {
@@ -78,7 +121,13 @@ app.use((_req, res) => {
 
 async function createUser(email, password) {
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = { email: email, password: passwordHash, token: uuid.v4() };
+  const user = {
+    email: email,
+    password: passwordHash,
+    token: uuid.v4(),
+    ratings: [],
+    criteria: '',
+  };
   users.push(user);
   return user;
 }
