@@ -1,115 +1,90 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './groups.css';
 
-const YOU = 'You';
-
-// This will be replaced with data from the database
-const INITIAL_GROUPS = [
-  {
-    name: 'MyFam',
-    members: [
-      {
-        name: 'Joe',
-        ratings: [
-          { id: 1, name: 'Terminator', rating: 9, date: '2022-03-14' },
-          { id: 2, name: 'Shane', rating: 8, date: '2021-11-02' },
-        ],
-      },
-      {
-        name: 'Jill',
-        ratings: [
-          { id: 1, name: 'Barbie', rating: 7.5, date: '2023-07-22' },
-          { id: 2, name: 'Inception', rating: 9.5, date: '2020-12-25' },
-        ],
-      },
-      {
-        name: 'Tim',
-        ratings: [{ id: 1, name: 'Casablanca', rating: 10, date: '2019-05-01' }],
-      },
-      { name: YOU, ratings: [] },
-    ],
-  },
-  {
-    name: 'MyFriends',
-    members: [
-      {
-        name: 'Sam',
-        ratings: [
-          { id: 1, name: 'Jaws', rating: 8.5, date: '2022-08-09' },
-          { id: 2, name: 'Alien', rating: 9, date: '2021-10-31' },
-        ],
-      },
-      {
-        name: 'Ava',
-        ratings: [{ id: 1, name: 'Titanic', rating: 7, date: '2020-02-14' }],
-      },
-      { name: YOU, ratings: [] },
-    ],
-  },
-  {
-    name: 'MovieBuffs',
-    members: [
-      {
-        name: 'Noah',
-        ratings: [{ id: 1, name: 'Gladiator', rating: 9, date: '2023-01-15' }],
-      },
-      {
-        name: 'Mia',
-        ratings: [{ id: 1, name: 'Up', rating: 8, date: '2022-06-30' }],
-      },
-    ],
-  },
+// This will be replaced with WebSocket messages
+const NOTIFICATION_POOL = [
+  { group: 'MyFam', member: 'Joe', movie: 'Terminator' },
+  { group: 'MyFam', member: 'Jill', movie: 'Barbie' },
+  { group: 'MyFam', member: 'Tim', movie: 'Casablanca' },
+  { group: 'MyFriends', member: 'Sam', movie: 'Jaws' },
+  { group: 'MyFriends', member: 'Ava', movie: 'Titanic' },
+  { group: 'MovieBuffs', member: 'Noah', movie: 'Gladiator' },
+  { group: 'MovieBuffs', member: 'Mia', movie: 'Up' },
 ];
-
-// This will be replaced with data from the database
-const CRITERIA = {
-  Joe: 'hard code placeholder',
-  Jill: 'hard code placeholder',
-  Tim: 'hard code placeholder',
-  Sam: 'hard code placeholder',
-  Ava: 'hard code placeholder',
-  Noah: 'hard code placeholder',
-  Mia: 'hard code placeholder',
-};
-
-function loadMyRatings() {
-  const saved = localStorage.getItem('ratings');
-  return saved ? JSON.parse(saved) : [];
-}
-
-function loadMyCriteria() {
-  return localStorage.getItem('criteria') || '';
-}
 
 function sortedRatings(list) {
   return [...list].sort((a, b) => b.rating - a.rating);
 }
 
-export function Groups() {
-  const [groups, setGroups] = React.useState(INITIAL_GROUPS);
-  const [myRatings] = React.useState(loadMyRatings);
-  const [myCriteria] = React.useState(loadMyCriteria);
+export function Groups({ onUnauthorized }) {
+  const navigate = useNavigate();
+  const [groups, setGroups] = React.useState([]);
   const [selectedGroup, setSelectedGroup] = React.useState(null);
+  const [groupDetail, setGroupDetail] = React.useState(null);
   const [selectedMember, setSelectedMember] = React.useState(null);
+  const [memberDetail, setMemberDetail] = React.useState(null);
   const [notifications, setNotifications] = React.useState([]);
   const [joinName, setJoinName] = React.useState('');
   const [joinMessage, setJoinMessage] = React.useState('');
+  const [message, setMessage] = React.useState('');
+
+  function handleUnauthorized() {
+    onUnauthorized();
+    navigate('/');
+  }
+
+  async function apiGet(path) {
+    try {
+      const response = await fetch(path);
+      if (response.status === 401) {
+        handleUnauthorized();
+        return null;
+      }
+      if (!response.ok) {
+        setMessage('Could not load that.');
+        return null;
+      }
+      setMessage('');
+      return await response.json();
+    } catch {
+      setMessage('Could not reach the server.');
+      return null;
+    }
+  }
+
+  async function loadGroups() {
+    const data = await apiGet('/api/groups');
+    if (data) setGroups(data);
+  }
 
   React.useEffect(() => {
-    // This will be replaced with WebSocket messages later
+    loadGroups();
+  }, []);
+
+  React.useEffect(() => {
+    if (!selectedGroup) return;
+    (async () => {
+      const data = await apiGet(`/api/groups/${encodeURIComponent(selectedGroup)}`);
+      if (data) setGroupDetail(data);
+    })();
+  }, [selectedGroup]);
+
+  React.useEffect(() => {
+    if (!selectedGroup || !selectedMember) return;
+    (async () => {
+      const data = await apiGet(
+        `/api/groups/${encodeURIComponent(selectedGroup)}/members/${encodeURIComponent(selectedMember)}`
+      );
+      if (data) setMemberDetail(data);
+    })();
+  }, [selectedMember]);
+
+  React.useEffect(() => {
+    // This will be replaced with WebSocket messages
     const timer = setInterval(() => {
-      const options = [];
-      groups
-        .filter((g) => g.members.some((m) => m.name === YOU))
-        .forEach((g) => {
-          g.members
-            .filter((m) => m.name !== YOU)
-            .forEach((m) => {
-              m.ratings.forEach((r) => {
-                options.push({ group: g.name, member: m.name, movie: r.name });
-              });
-            });
-        });
+      const names = groups.map((g) => g.name);
+      const options = NOTIFICATION_POOL.filter((n) => names.includes(n.group));
       if (options.length === 0) return;
 
       const pick = options[Math.floor(Math.random() * options.length)];
@@ -120,111 +95,145 @@ export function Groups() {
     return () => clearInterval(timer);
   }, [groups]);
 
-  function handleJoin(event) {
-    event.preventDefault();
-    const wanted = joinName.trim().toLowerCase();
-    const target = groups.find((g) => g.name.toLowerCase() === wanted);
-
-    if (!target) {
-      setJoinMessage(`No group named "${joinName.trim()}" was found.`);
-      return;
-    }
-    if (target.members.some((m) => m.name === YOU)) {
-      setJoinMessage(`You're already in ${target.name}.`);
-      return;
-    }
-
-    // This will be replaced with a call to the join endpoint
-    setGroups(
-      groups.map((g) =>
-        g === target ? { ...g, members: [...g.members, { name: YOU, ratings: [] }] } : g
-      )
-    );
-    setJoinMessage(`You joined ${target.name}!`);
-    setJoinName('');
+  function openGroup(name) {
+    setGroupDetail(null);
+    setSelectedGroup(name);
   }
 
-  const myGroups = groups.filter((g) => g.members.some((m) => m.name === YOU));
-  const group = selectedGroup ? groups.find((g) => g.name === selectedGroup) : null;
-  const member = group && selectedMember ? group.members.find((m) => m.name === selectedMember) : null;
+  function closeGroup() {
+    setSelectedMember(null);
+    setMemberDetail(null);
+    setSelectedGroup(null);
+    setGroupDetail(null);
+  }
+
+  function openMember(id) {
+    setMemberDetail(null);
+    setSelectedMember(id);
+  }
+
+  function closeMember() {
+    setSelectedMember(null);
+    setMemberDetail(null);
+  }
+
+  async function handleJoin(event) {
+    event.preventDefault();
+    const wanted = joinName.trim();
+    try {
+      const response = await fetch('/api/groups/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: wanted }),
+      });
+      if (response.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+      if (response.ok) {
+        const data = await response.json();
+        setJoinMessage(`You joined ${data.name}!`);
+        setJoinName('');
+        loadGroups();
+      } else if (response.status === 404) {
+        setJoinMessage(`No group named "${wanted}" was found.`);
+      } else if (response.status === 409) {
+        setJoinMessage(`You're already in "${wanted}".`);
+      } else {
+        setJoinMessage('Could not join that group.');
+      }
+    } catch {
+      setJoinMessage('Could not reach the server.');
+    }
+  }
 
   let content;
 
-  if (member) {
-    const ratings = sortedRatings(member.name === YOU ? myRatings : member.ratings);
-    const criteria = member.name === YOU ? myCriteria : CRITERIA[member.name];
-    content = (
-      <>
-        <button type="button" className="btn btn-secondary mb-3" onClick={() => setSelectedMember(null)}>
-          &larr; Back to {group.name}
-        </button>
-        <h2>{member.name === YOU ? 'Your ratings' : `${member.name}'s ratings`}</h2>
-        <div className="row">
-          <div className="col-md-8">
-            <table className="table table-striped">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Name</th>
-                  <th>Rating</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ratings.length === 0 ? (
+  if (selectedGroup && selectedMember) {
+    if (!memberDetail) {
+      content = <p>Loading...</p>;
+    } else {
+      const ratings = sortedRatings(memberDetail.ratings);
+      content = (
+        <>
+          <button type="button" className="btn btn-secondary mb-3" onClick={closeMember}>
+            &larr; Back to {selectedGroup}
+          </button>
+          <h2>{memberDetail.isYou ? 'Your ratings' : `${memberDetail.name}'s ratings`}</h2>
+          <div className="row">
+            <div className="col-md-8">
+              <table className="table table-striped">
+                <thead>
                   <tr>
-                    <td colSpan="4">No ratings yet</td>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Rating</th>
+                    <th>Date</th>
                   </tr>
-                ) : (
-                  ratings.map((r, i) => (
-                    <tr key={r.id}>
-                      <td>{i + 1}</td>
-                      <td>{r.name}</td>
-                      <td>{r.rating}</td>
-                      <td>{r.date}</td>
+                </thead>
+                <tbody>
+                  {ratings.length === 0 ? (
+                    <tr>
+                      <td colSpan="4">No ratings yet</td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  ) : (
+                    ratings.map((r, i) => (
+                      <tr key={r.id}>
+                        <td>{i + 1}</td>
+                        <td>{r.name}</td>
+                        <td>{r.rating}</td>
+                        <td>{r.date}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
 
-          <div className="col-md-4">
-            <div className="border rounded p-3">
-              <h3 className="h5">MyRating Criteria:</h3>
-              <p style={{ whiteSpace: 'pre-wrap' }}>{criteria || 'No criteria written yet.'}</p>
+            <div className="col-md-4">
+              <div className="border rounded p-3">
+                <h3 className="h5">MyRating Criteria:</h3>
+                <p style={{ whiteSpace: 'pre-wrap' }}>
+                  {memberDetail.criteria || 'No criteria written yet.'}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </>
-    );
-  } else if (group) {
-    content = (
-      <>
-        <button type="button" className="btn btn-secondary mb-3" onClick={() => setSelectedGroup(null)}>
-          &larr; Back to groups
-        </button>
-        <h2>{group.name}</h2>
-        <table className="table table-striped">
-          <thead>
-            <tr>
-              <th>Member</th>
-            </tr>
-          </thead>
-          <tbody>
-            {group.members.map((m) => (
-              <tr key={m.name}>
-                <td>
-                  <button type="button" className="btn btn-link p-0" onClick={() => setSelectedMember(m.name)}>
-                    {m.name}
-                  </button>
-                </td>
+        </>
+      );
+    }
+  } else if (selectedGroup) {
+    if (!groupDetail) {
+      content = <p>Loading...</p>;
+    } else {
+      content = (
+        <>
+          <button type="button" className="btn btn-secondary mb-3" onClick={closeGroup}>
+            &larr; Back to groups
+          </button>
+          <h2>{groupDetail.name}</h2>
+          <table className="table table-striped">
+            <thead>
+              <tr>
+                <th>Member</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </>
-    );
+            </thead>
+            <tbody>
+              {groupDetail.members.map((m) => (
+                <tr key={m.id}>
+                  <td>
+                    <button type="button" className="btn btn-link p-0" onClick={() => openMember(m.id)}>
+                      {m.name}
+                    </button>
+                    {m.isYou && ' (you)'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      );
+    }
   } else {
     content = (
       <>
@@ -236,19 +245,19 @@ export function Groups() {
             </tr>
           </thead>
           <tbody>
-            {myGroups.length === 0 ? (
+            {groups.length === 0 ? (
               <tr>
                 <td colSpan="2">You haven't joined any groups yet</td>
               </tr>
             ) : (
-              myGroups.map((g) => (
+              groups.map((g) => (
                 <tr key={g.name}>
                   <td>
-                    <button type="button" className="btn btn-link p-0" onClick={() => setSelectedGroup(g.name)}>
+                    <button type="button" className="btn btn-link p-0" onClick={() => openGroup(g.name)}>
                       {g.name}
                     </button>
                   </td>
-                  <td>{g.members.length}</td>
+                  <td>{g.memberCount}</td>
                 </tr>
               ))
             )}
@@ -286,6 +295,8 @@ export function Groups() {
           ))
         )}
       </ul>
+
+      {message && <p>{message}</p>}
 
       {content}
     </main>

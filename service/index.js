@@ -10,6 +10,61 @@ const port = process.argv.length > 2 ? process.argv[2] : 4000;
 // In-memory data. This will be replaced by a database in a later deliverable.
 let users = [];
 
+// Starting data standing in for other users. This will be replaced by real data in the database.
+const SEED_MEMBERS = {
+  'seed-joe': {
+    name: 'Joe',
+    criteria: 'Story and ending matter most. Cool effects never make up for a weak script.',
+    ratings: [
+      { id: 'joe-1', name: 'Terminator', rating: 9, date: '2022-03-14' },
+      { id: 'joe-2', name: 'Shane', rating: 8, date: '2021-11-02' },
+    ],
+  },
+  'seed-jill': {
+    name: 'Jill',
+    criteria: 'I rate how I felt when it ended and whether I want to watch it again.',
+    ratings: [
+      { id: 'jill-1', name: 'Barbie', rating: 7.5, date: '2023-07-22' },
+      { id: 'jill-2', name: 'Inception', rating: 9.5, date: '2020-12-25' },
+    ],
+  },
+  'seed-tim': {
+    name: 'Tim',
+    criteria: 'Classics set the bar. A 10 has to hold up decades later.',
+    ratings: [{ id: 'tim-1', name: 'Casablanca', rating: 10, date: '2019-05-01' }],
+  },
+  'seed-sam': {
+    name: 'Sam',
+    criteria: 'Tension and craft. Great filmmaking beats a happy ending.',
+    ratings: [
+      { id: 'sam-1', name: 'Jaws', rating: 8.5, date: '2022-08-09' },
+      { id: 'sam-2', name: 'Alien', rating: 9, date: '2021-10-31' },
+    ],
+  },
+  'seed-ava': {
+    name: 'Ava',
+    criteria: 'Characters first. If I do not care about them, the rest does not matter.',
+    ratings: [{ id: 'ava-1', name: 'Titanic', rating: 7, date: '2020-02-14' }],
+  },
+  'seed-noah': {
+    name: 'Noah',
+    criteria: 'Ambition and scale, and whether it earns its length.',
+    ratings: [{ id: 'noah-1', name: 'Gladiator', rating: 9, date: '2023-01-15' }],
+  },
+  'seed-mia': {
+    name: 'Mia',
+    criteria: 'Heart and originality. Bonus points for making me laugh.',
+    ratings: [{ id: 'mia-1', name: 'Up', rating: 8, date: '2022-06-30' }],
+  },
+};
+
+// Groups hold member ids, never email addresses
+const groups = [
+  { name: 'MyFam', members: ['seed-joe', 'seed-jill', 'seed-tim'] },
+  { name: 'MyFriends', members: ['seed-sam', 'seed-ava'] },
+  { name: 'MovieBuffs', members: ['seed-noah', 'seed-mia'] },
+];
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static('public'));
@@ -109,6 +164,62 @@ apiRouter.put('/criteria', verifyAuth, (req, res) => {
   res.send({ criteria: req.user.criteria });
 });
 
+// Get the groups the logged-in user belongs to
+apiRouter.get('/groups', verifyAuth, (req, res) => {
+  const mine = groups
+    .filter((g) => g.members.includes(req.user.id))
+    .map((g) => ({ name: g.name, memberCount: g.members.length }));
+  res.send(mine);
+});
+
+// Join a group by name
+apiRouter.post('/groups/join', verifyAuth, (req, res) => {
+  const wanted = typeof req.body.name === 'string' ? req.body.name.trim().toLowerCase() : '';
+  const group = groups.find((g) => g.name.toLowerCase() === wanted);
+  if (!group) {
+    res.status(404).send({ msg: 'No group with that name' });
+    return;
+  }
+  if (group.members.includes(req.user.id)) {
+    res.status(409).send({ msg: 'Already a member' });
+    return;
+  }
+  group.members.push(req.user.id);
+  res.send({ name: group.name });
+});
+
+// Get the members of one of the user's groups
+apiRouter.get('/groups/:groupName', verifyAuth, (req, res) => {
+  const group = groups.find((g) => g.name === req.params.groupName);
+  if (!group || !group.members.includes(req.user.id)) {
+    res.status(404).send({ msg: 'Group not found' });
+    return;
+  }
+  const members = group.members.map((id) => ({
+    id: id,
+    name: getMember(id).name,
+    isYou: id === req.user.id,
+  }));
+  res.send({ name: group.name, members: members });
+});
+
+// Get one member's ratings and criteria. Both people must be in the group.
+apiRouter.get('/groups/:groupName/members/:memberId', verifyAuth, (req, res) => {
+  const group = groups.find((g) => g.name === req.params.groupName);
+  const memberId = req.params.memberId;
+  if (!group || !group.members.includes(req.user.id) || !group.members.includes(memberId)) {
+    res.status(404).send({ msg: 'Member not found' });
+    return;
+  }
+  const member = getMember(memberId);
+  res.send({
+    name: member.name,
+    isYou: memberId === req.user.id,
+    ratings: member.ratings,
+    criteria: member.criteria,
+  });
+});
+
 // Default error handler
 app.use(function (err, req, res, next) {
   res.status(500).send({ type: err.name, message: err.message });
@@ -122,6 +233,7 @@ app.use((_req, res) => {
 async function createUser(email, password) {
   const passwordHash = await bcrypt.hash(password, 10);
   const user = {
+    id: uuid.v4(),
     email: email,
     password: passwordHash,
     token: uuid.v4(),
@@ -129,12 +241,27 @@ async function createUser(email, password) {
     criteria: '',
   };
   users.push(user);
+
+  // New accounts start in these groups until there is a way to create groups
+  groups.forEach((g) => {
+    if (g.name === 'MyFam' || g.name === 'MyFriends') {
+      g.members.push(user.id);
+    }
+  });
+
   return user;
 }
 
 async function findUser(field, value) {
   if (!value) return null;
   return users.find((u) => u[field] === value);
+}
+
+// A group member is either a seed member or a real user. Real users show as the part of the email before the @.
+function getMember(id) {
+  if (SEED_MEMBERS[id]) return SEED_MEMBERS[id];
+  const user = users.find((u) => u.id === id);
+  return { name: user.email.split('@')[0], ratings: user.ratings, criteria: user.criteria };
 }
 
 function setAuthCookie(res, authToken) {

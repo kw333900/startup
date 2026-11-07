@@ -59,7 +59,7 @@ export default function App() {
             }
           />
           <Route path='/myratings' element={<MyRatings onUnauthorized={handleUnauthorized} />} />
-          <Route path='/groups' element={<Groups />} />
+          <Route path='/groups' element={<Groups onUnauthorized={handleUnauthorized} />} />
           <Route path='/about' element={<About />} />
           <Route path='*' element={<NotFound />} />
         </Routes>
