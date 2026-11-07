@@ -3,22 +3,20 @@ import { AuthState } from './authState';
 import { Authenticated } from './authenticated';
 import { Unauthenticated } from './unauthenticated';
 
-const MOCK_QUOTES = [
-  { quote: "I'll be back.", show: 'The Terminator' },
-  { quote: "You can't handle the truth!", show: 'A Few Good Men' },
-  { quote: 'May the Force be with you.', show: 'Star Wars' },
-];
-
-// This will be replaced with a call to the quote service later
-function getRandomQuote() {
-  return MOCK_QUOTES[Math.floor(Math.random() * MOCK_QUOTES.length)];
-}
-
 export function Login({ userName, authState, onAuthChange }) {
-  const [quote, setQuote] = React.useState({ quote: 'Loading...', show: '' });
+  const [quote, setQuote] = React.useState(null);
 
   React.useEffect(() => {
-    setQuote(getRandomQuote());
+    fetch('https://quote.cs260.click')
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.quote) {
+          setQuote({ text: data.quote, author: data.author });
+        }
+      })
+      .catch(() => {
+        // The quote is optional, so the page still works without it
+      });
   }, []);
 
   return (
@@ -37,10 +35,12 @@ export function Login({ userName, authState, onAuthChange }) {
         />
       )}
 
-      <blockquote className="blockquote mt-5">
-        <p className="mb-0">&ldquo;{quote.quote}&rdquo;</p>
-        <div className="blockquote-footer mt-3">{quote.show}</div>
-      </blockquote>
+      {quote && (
+        <blockquote className="blockquote mt-5">
+          <p className="mb-0">&ldquo;{quote.text}&rdquo;</p>
+          <div className="blockquote-footer mt-3">{quote.author}</div>
+        </blockquote>
+      )}
     </main>
   );
 }
