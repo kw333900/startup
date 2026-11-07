@@ -124,13 +124,13 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
 - [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [x] **Node.js/Express HTTP service** - 
-- [x] **Static middleware for frontend** - I did not complete this part of the deliverable.
-- [x] **Calls to third party endpoints** - I did not complete this part of the deliverable.
-- [x] **Backend service endpoints** - I did not complete this part of the deliverable.
-- [x] **Frontend calls service endpoints** - I did not complete this part of the deliverable.
-- [x] **Supports registration, login, logout, and restricted endpoint** - I did not complete this part of the deliverable.
-- [x] **Uses BCrypt to hash passwords** - I did not complete this part of the deliverable.
+- [x] **Node.js/Express HTTP service** - A Node/Express service in `service/index.js` listens on port 4000.
+- [x] **Static middleware for frontend** - The service serves the built React app from its `public` folder.
+- [x] **Calls to third party endpoints** - The login page fetches a random quote from `quote.cs260.click`.
+- [x] **Backend service endpoints** - Endpoints for accounts, ratings, criteria, and groups, with data held in memory for now.
+- [x] **Frontend calls service endpoints** - Login, MyRatings, and Groups all get and save their data through the service instead of `localStorage`.
+- [x] **Supports registration, login, logout, and restricted endpoint** - Users can create an account, log in, and log out. The ratings, criteria, and groups endpoints return 401 without a valid login cookie.
+- [x] **Uses BCrypt to hash passwords** - Passwords are hashed with `bcryptjs` before they are stored.
 
 ## 🚀 DB deliverable
 
