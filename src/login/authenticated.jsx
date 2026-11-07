@@ -5,8 +5,14 @@ export function Authenticated({ userName, onLogout }) {
   const navigate = useNavigate();
 
   function logout() {
-    localStorage.removeItem('userName');
-    onLogout();
+    fetch('/api/auth/logout', { method: 'DELETE' })
+      .catch(() => {
+        // Logout failed. Assuming offline
+      })
+      .finally(() => {
+        localStorage.removeItem('userName');
+        onLogout();
+      });
   }
 
   return (
