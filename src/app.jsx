@@ -14,6 +14,14 @@ export default function App() {
     userName ? AuthState.Authenticated : AuthState.Unauthenticated
   );
 
+
+    function handleUnauthorized() {
+    localStorage.removeItem('userName');
+    setUserName('');
+    setAuthState(AuthState.Unauthenticated);
+  }
+
+
   return (
     <BrowserRouter>
       <div className="body bg-dark text-light">
@@ -50,7 +58,7 @@ export default function App() {
               />
             }
           />
-          <Route path='/myratings' element={<MyRatings />} />
+          <Route path='/myratings' element={<MyRatings onUnauthorized={handleUnauthorized} />} />
           <Route path='/groups' element={<Groups />} />
           <Route path='/about' element={<About />} />
           <Route path='*' element={<NotFound />} />

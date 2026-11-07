@@ -1,75 +1,129 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './myratings.css';
 
-const STARTER_RATINGS = [
-  { id: 1, name: 'Inception', rating: 10, date: '2021-05-20' },
-  { id: 2, name: 'Barbie', rating: 9, date: '2021-06-02' },
-  { id: 3, name: 'Shane', rating: 8.5, date: '2020-07-03' },
-];
-
-export function MyRatings() {
-  const [ratings, setRatings] = React.useState(() => {
-    const saved = localStorage.getItem('ratings');
-    return saved ? JSON.parse(saved) : STARTER_RATINGS;
-  });
+export function MyRatings({ onUnauthorized }) {
+  const navigate = useNavigate();
+  const [ratings, setRatings] = React.useState([]);
   const [showForm, setShowForm] = React.useState(false);
   const [name, setName] = React.useState('');
   const [rating, setRating] = React.useState('');
   const [date, setDate] = React.useState('');
+  const [message, setMessage] = React.useState('');
+
+  const [criteria, setCriteria] = React.useState('');
+  const [editingCriteria, setEditingCriteria] = React.useState(false);
+  const [criteriaDraft, setCriteriaDraft] = React.useState('');
+
+  function handleUnauthorized() {
+    onUnauthorized();
+    navigate('/');
+  }
 
   React.useEffect(() => {
-    localStorage.setItem('ratings', JSON.stringify(ratings));
-  }, [ratings]);
+    async function load() {
+      try {
+        const [ratingsRes, criteriaRes] = await Promise.all([
+          fetch('/api/ratings'),
+          fetch('/api/criteria'),
+        ]);
+        if (ratingsRes.status === 401 || criteriaRes.status === 401) {
+          handleUnauthorized();
+          return;
+        }
+        const ratingsData = await ratingsRes.json();
+        const criteriaData = await criteriaRes.json();
+        setRatings(ratingsData);
+        setCriteria(criteriaData.criteria);
+        setCriteriaDraft(criteriaData.criteria);
+        setEditingCriteria(criteriaData.criteria === '');
+      } catch {
+        setMessage('Could not reach the server.');
+      }
+    }
+    load();
+  }, []);
 
-  const [criteria, setCriteria] = React.useState(() => localStorage.getItem('criteria') || '');
-  const [editingCriteria, setEditingCriteria] = React.useState(criteria === '');
-  const [criteriaDraft, setCriteriaDraft] = React.useState(criteria);
+  async function handleSubmit(event) {
+    event.preventDefault();
+    if (!name.trim()) return;
 
-  React.useEffect(() => {
-    localStorage.setItem('criteria', criteria);
-  }, [criteria]);
+    try {
+      const response = await fetch('/api/ratings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), rating: Number(rating), date: date }),
+      });
+      if (response.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+      if (!response.ok) {
+        setMessage('Could not save that rating.');
+        return;
+      }
+      setRatings(await response.json());
+      setMessage('');
+      setName('');
+      setRating('');
+      setDate('');
+      setShowForm(false);
+    } catch {
+      setMessage('Could not reach the server.');
+    }
+  }
 
   function startEditingCriteria() {
     setCriteriaDraft(criteria);
     setEditingCriteria(true);
   }
 
-  function saveCriteria() {
-    setCriteria(criteriaDraft.trim());
-    setEditingCriteria(false);
-  }
-
-  function handleSubmit(event) {
-    event.preventDefault();
-    if (!name.trim()) return;
-
-    const newRating = {
-      id: Date.now(),
-      name: name.trim(),
-      rating: Number(rating),
-      date: date,
-    };
-
-    setRatings([...ratings, newRating]);
-    setName('');
-    setRating('');
-    setDate('');
-    setShowForm(false);
+  async function saveCriteria() {
+    try {
+      const response = await fetch('/api/criteria', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ criteria: criteriaDraft.trim() }),
+      });
+      if (response.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+      if (!response.ok) {
+        setMessage('Could not save your criteria.');
+        return;
+      }
+      const data = await response.json();
+      setCriteria(data.criteria);
+      setMessage('');
+      setEditingCriteria(false);
+    } catch {
+      setMessage('Could not reach the server.');
+    }
   }
 
   const sortedRatings = [...ratings].sort((a, b) => b.rating - a.rating);
 
-  const rows = sortedRatings.map((r, i) => (
-    <tr key={r.id}>
-      <td>{i + 1}</td>
-      <td>{r.name}</td>
-      <td>{r.rating}</td>
-      <td>{r.date}</td>
-    </tr>
-  ));
+  const rows =
+    sortedRatings.length === 0 ? (
+      <tr>
+        <td colSpan="4">No ratings yet</td>
+      </tr>
+    ) : (
+      sortedRatings.map((r, i) => (
+        <tr key={r.id}>
+          <td>{i + 1}</td>
+          <td>{r.name}</td>
+          <td>{r.rating}</td>
+          <td>{r.date}</td>
+        </tr>
+      ))
+    );
 
   return (
     <main>
+      {message && <p>{message}</p>}
+
       <div className="d-flex justify-content-end mb-2">
         <button
           type="button"
