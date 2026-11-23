@@ -138,7 +138,7 @@ MongoDB persistence is implemented in the backend. Local verification and produc
 
 - [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
 - [ ] **Stores data in MongoDB** - `service/database.js` connects to the `tnratings` database. User ratings, criteria, and group membership are saved in MongoDB.
-- [ ] **Stores credentials in MongoDB** - The `user` collection stores account records with bcrypt password hashes and authentication tokens.
+- [x] **Stores credentials in MongoDB** - The `user` collection stores account records with bcrypt password hashes and authentication tokens.
 
 ## 🚀 WebSocket deliverable
 
