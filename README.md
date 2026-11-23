@@ -134,11 +134,11 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 ## 🚀 DB deliverable
 
-For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
+MongoDB persistence is implemented in the backend. Local verification and production deployment are still in progress, so the rubric items below remain unchecked until those steps are complete.
 
 - [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [x] **Stores data in MongoDB** - I did not complete this part of the deliverable.
-- [x] **Stores credentials in MongoDB** - I did not complete this part of the deliverable.
+- [ ] **Stores data in MongoDB** - `service/database.js` connects to the `tnratings` database. User ratings, criteria, and group membership are saved in MongoDB.
+- [ ] **Stores credentials in MongoDB** - The `user` collection stores account records with bcrypt password hashes and authentication tokens.
 
 ## 🚀 WebSocket deliverable
 

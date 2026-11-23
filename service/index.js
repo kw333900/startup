@@ -2,15 +2,13 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
 const uuid = require('uuid');
+const DB = require('./database.js');
 
 const app = express();
 const authCookieName = 'token';
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
+let httpServer;
 
-// In-memory data. This will be replaced by a database in a later deliverable.
-let users = [];
-
-// Starting data standing in for other users. This will be replaced by real data in the database.
 const SEED_MEMBERS = {
   'seed-joe': {
     name: 'Joe',
@@ -58,13 +56,6 @@ const SEED_MEMBERS = {
   },
 };
 
-// Groups hold member ids, never email addresses
-const groups = [
-  { name: 'MyFam', members: ['seed-joe', 'seed-jill', 'seed-tim'] },
-  { name: 'MyFriends', members: ['seed-sam', 'seed-ava'] },
-  { name: 'MovieBuffs', members: ['seed-noah', 'seed-mia'] },
-];
-
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static('public'));
@@ -72,63 +63,86 @@ app.use(express.static('public'));
 const apiRouter = express.Router();
 app.use('/api', apiRouter);
 
-// Create a new account
 apiRouter.post('/auth/create', async (req, res) => {
-  const { email, password } = req.body;
+  const body = req.body ?? {};
+  const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
+  const password = typeof body.password === 'string' ? body.password : '';
+
   if (!email || !password) {
     res.status(400).send({ msg: 'Email and password required' });
     return;
   }
-  if (await findUser('email', email)) {
+
+  if (await DB.findUser('email', email)) {
     res.status(409).send({ msg: 'Existing user' });
-  } else {
-    const user = await createUser(email, password);
-    setAuthCookie(res, user.token);
-    res.send({ email: user.email });
+    return;
   }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+  const user = {
+    id: uuid.v4(),
+    email,
+    password: passwordHash,
+    token: uuid.v4(),
+    ratings: [],
+    criteria: '',
+  };
+
+  try {
+    await DB.addUser(user);
+  } catch (err) {
+    if (err.code === 11000) {
+      res.status(409).send({ msg: 'Existing user' });
+      return;
+    }
+    throw err;
+  }
+
+  setAuthCookie(res, user.token);
+  res.send({ email: user.email });
 });
 
-// Log in an existing user
 apiRouter.post('/auth/login', async (req, res) => {
-  const user = await findUser('email', req.body.email);
-  if (user && (await bcrypt.compare(req.body.password, user.password))) {
-    user.token = uuid.v4();
-    setAuthCookie(res, user.token);
+  const body = req.body ?? {};
+  const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
+  const password = typeof body.password === 'string' ? body.password : '';
+  const user = await DB.findUser('email', email);
+
+  if (user && password && (await bcrypt.compare(password, user.password))) {
+    const token = uuid.v4();
+    await DB.updateUserToken(user.id, token);
+    setAuthCookie(res, token);
     res.send({ email: user.email });
     return;
   }
+
   res.status(401).send({ msg: 'Unauthorized' });
 });
 
-// Log out
 apiRouter.delete('/auth/logout', async (req, res) => {
-  const user = await findUser('token', req.cookies[authCookieName]);
-  if (user) {
-    delete user.token;
-  }
+  const user = await DB.findUser('token', req.cookies[authCookieName]);
+  if (user) await DB.removeUserToken(user.id);
   res.clearCookie(authCookieName);
   res.status(204).end();
 });
 
-// Guard for endpoints that need a logged-in user
 const verifyAuth = async (req, res, next) => {
-  const user = await findUser('token', req.cookies[authCookieName]);
-  if (user) {
-    req.user = user;
-    next();
-  } else {
+  const user = await DB.findUser('token', req.cookies[authCookieName]);
+  if (!user) {
     res.status(401).send({ msg: 'Unauthorized' });
+    return;
   }
+  req.user = user;
+  next();
 };
 
-// Get the logged-in user's ratings
 apiRouter.get('/ratings', verifyAuth, (req, res) => {
-  res.send(req.user.ratings);
+  res.send(req.user.ratings ?? []);
 });
 
-// Add a rating for the logged-in user
-apiRouter.post('/ratings', verifyAuth, (req, res) => {
-  const { name, rating, date } = req.body;
+apiRouter.post('/ratings', verifyAuth, async (req, res) => {
+  const body = req.body ?? {};
+  const { name, rating, date } = body;
   const valid =
     typeof name === 'string' &&
     name.trim() !== '' &&
@@ -144,38 +158,38 @@ apiRouter.post('/ratings', verifyAuth, (req, res) => {
     return;
   }
 
-  req.user.ratings.push({ id: uuid.v4(), name: name.trim(), rating: rating, date: date });
-  res.send(req.user.ratings);
+  const ratings = await DB.addRating(req.user.id, {
+    id: uuid.v4(),
+    name: name.trim(),
+    rating,
+    date,
+  });
+  res.send(ratings);
 });
 
-// Get the logged-in user's criteria text
 apiRouter.get('/criteria', verifyAuth, (req, res) => {
-  res.send({ criteria: req.user.criteria });
+  res.send({ criteria: req.user.criteria ?? '' });
 });
 
-// Save the logged-in user's criteria text
-apiRouter.put('/criteria', verifyAuth, (req, res) => {
-  const { criteria } = req.body;
+apiRouter.put('/criteria', verifyAuth, async (req, res) => {
+  const criteria = req.body?.criteria;
   if (typeof criteria !== 'string' || criteria.length > 2000) {
     res.status(400).send({ msg: 'Criteria must be text of 2000 characters or fewer' });
     return;
   }
-  req.user.criteria = criteria;
-  res.send({ criteria: req.user.criteria });
+
+  await DB.updateCriteria(req.user.id, criteria);
+  res.send({ criteria });
 });
 
-// Get the groups the logged-in user belongs to
-apiRouter.get('/groups', verifyAuth, (req, res) => {
-  const mine = groups
-    .filter((g) => g.members.includes(req.user.id))
-    .map((g) => ({ name: g.name, memberCount: g.members.length }));
-  res.send(mine);
+apiRouter.get('/groups', verifyAuth, async (req, res) => {
+  const groups = await DB.getGroupsForUser(req.user.id);
+  res.send(groups.map((group) => ({ name: group.name, memberCount: group.members.length })));
 });
 
-// Join a group by name
-apiRouter.post('/groups/join', verifyAuth, (req, res) => {
-  const wanted = typeof req.body.name === 'string' ? req.body.name.trim().toLowerCase() : '';
-  const group = groups.find((g) => g.name.toLowerCase() === wanted);
+apiRouter.post('/groups/join', verifyAuth, async (req, res) => {
+  const wanted = typeof req.body?.name === 'string' ? req.body.name.trim() : '';
+  const group = await DB.findGroupByName(wanted);
   if (!group) {
     res.status(404).send({ msg: 'No group with that name' });
     return;
@@ -184,34 +198,41 @@ apiRouter.post('/groups/join', verifyAuth, (req, res) => {
     res.status(409).send({ msg: 'Already a member' });
     return;
   }
-  group.members.push(req.user.id);
+
+  await DB.addGroupMember(group.name, req.user.id);
   res.send({ name: group.name });
 });
 
-// Get the members of one of the user's groups
-apiRouter.get('/groups/:groupName', verifyAuth, (req, res) => {
-  const group = groups.find((g) => g.name === req.params.groupName);
+apiRouter.get('/groups/:groupName', verifyAuth, async (req, res) => {
+  const group = await DB.findGroupByName(req.params.groupName);
   if (!group || !group.members.includes(req.user.id)) {
     res.status(404).send({ msg: 'Group not found' });
     return;
   }
-  const members = group.members.map((id) => ({
-    id: id,
-    name: getMember(id).name,
-    isYou: id === req.user.id,
-  }));
-  res.send({ name: group.name, members: members });
+
+  const members = await Promise.all(
+    group.members.map(async (id) => {
+      const member = await getMember(id);
+      return member && { id, name: member.name, isYou: id === req.user.id };
+    })
+  );
+  res.send({ name: group.name, members: members.filter(Boolean) });
 });
 
-// Get one member's ratings and criteria. Both people must be in the group.
-apiRouter.get('/groups/:groupName/members/:memberId', verifyAuth, (req, res) => {
-  const group = groups.find((g) => g.name === req.params.groupName);
+apiRouter.get('/groups/:groupName/members/:memberId', verifyAuth, async (req, res) => {
+  const group = await DB.findGroupByName(req.params.groupName);
   const memberId = req.params.memberId;
   if (!group || !group.members.includes(req.user.id) || !group.members.includes(memberId)) {
     res.status(404).send({ msg: 'Member not found' });
     return;
   }
-  const member = getMember(memberId);
+
+  const member = await getMember(memberId);
+  if (!member) {
+    res.status(404).send({ msg: 'Member not found' });
+    return;
+  }
+
   res.send({
     name: member.name,
     isYou: memberId === req.user.id,
@@ -220,48 +241,24 @@ apiRouter.get('/groups/:groupName/members/:memberId', verifyAuth, (req, res) => 
   });
 });
 
-// Default error handler
-app.use(function (err, req, res, next) {
-  res.status(500).send({ type: err.name, message: err.message });
+app.use((err, req, res, next) => {
+  console.error(`Request failed: ${err.name}: ${err.message}`);
+  res.status(500).send({ msg: 'Internal server error' });
 });
 
-// Any unknown path returns the app's main page, so refreshing on /groups works
 app.use((_req, res) => {
   res.sendFile('index.html', { root: 'public' });
 });
 
-async function createUser(email, password) {
-  const passwordHash = await bcrypt.hash(password, 10);
-  const user = {
-    id: uuid.v4(),
-    email: email,
-    password: passwordHash,
-    token: uuid.v4(),
-    ratings: [],
-    criteria: '',
-  };
-  users.push(user);
-
-  // New accounts start in these groups until there is a way to create groups
-  groups.forEach((g) => {
-    if (g.name === 'MyFam' || g.name === 'MyFriends') {
-      g.members.push(user.id);
-    }
-  });
-
-  return user;
-}
-
-async function findUser(field, value) {
-  if (!value) return null;
-  return users.find((u) => u[field] === value);
-}
-
-// A group member is either a seed member or a real user. Real users show as the part of the email before the @.
-function getMember(id) {
+async function getMember(id) {
   if (SEED_MEMBERS[id]) return SEED_MEMBERS[id];
-  const user = users.find((u) => u.id === id);
-  return { name: user.email.split('@')[0], ratings: user.ratings, criteria: user.criteria };
+  const user = await DB.findUser('id', id);
+  if (!user) return null;
+  return {
+    name: user.email.split('@')[0],
+    ratings: user.ratings ?? [],
+    criteria: user.criteria ?? '',
+  };
 }
 
 function setAuthCookie(res, authToken) {
@@ -272,6 +269,29 @@ function setAuthCookie(res, authToken) {
   });
 }
 
-app.listen(port, () => {
-  console.log(`Listening on port ${port}`);
+async function start() {
+  await DB.connect();
+  httpServer = app.listen(port, () => {
+    console.log(`Listening on port ${port}`);
+  });
+}
+
+async function shutdown() {
+  if (httpServer) {
+    httpServer.close(async () => {
+      await DB.close();
+      process.exit(0);
+    });
+    return;
+  }
+  await DB.close();
+  process.exit(0);
+}
+
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
+
+start().catch((err) => {
+  console.error(`Unable to start service: ${err.name}: ${err.message}`);
+  process.exit(1);
 });
