@@ -136,7 +136,7 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 MongoDB persistence is implemented in the backend and was verified locally by logging in again and confirming that ratings and criteria remained after restarting the service. Production deployment remains to do.
 
-- [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
+- [] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
 - [x] **Stores data in MongoDB** - `service/database.js` connects to the `tnratings` database. User ratings, criteria, and group membership are saved in MongoDB and persist after restarting the service.
 - [x] **Stores credentials in MongoDB** - The `user` collection stores account records with bcrypt password hashes and authentication tokens. Logging in again after restarting the service confirmed that credentials persist.
 
