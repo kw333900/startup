@@ -34,5 +34,4 @@ It is when the data under the hood is accurately changed and reflected after the
 - The backend connects to the `tnratings` database through `service/database.js`.
 - User documents contain bcrypt password hashes, authentication tokens, ratings, and criteria.
 - Group membership is stored in MongoDB. Default groups are inserted only when they do not already exist, so app restarts preserve membership changes.
-- Local verification: I logged in again after restarting the backend and confirmed that the account, ratings, and criteria remained available.
-- Production deployment of Startup DB is still to do.
+
