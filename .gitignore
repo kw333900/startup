@@ -3,3 +3,4 @@ simon-react-p1/node_modules
 node_modules
 dist
 cookies.txt
+dbConfig.json
